@@ -1,8 +1,9 @@
-from flask import Flask, request, jsonify, render_template
 import redis
+import json
+from flask import Flask, request, jsonify
 
 app = Flask(__name__)
-r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+r = redis.StrictRedis(host='localhost', port=6379, db=0, decode_responses=True)
 
 @app.route('/start_poll', methods=['POST'])
 def start_poll():
@@ -10,24 +11,13 @@ def start_poll():
     poll_id = data['poll_id']
     questions = data['questions']
     
-    # Armazena as perguntas e opções no Redis
-    r.hmset(f'poll:{poll_id}:questions', questions)
-    r.set(f'poll:{poll_id}:active', 'true')
+    # Converter perguntas e opções para JSON
+    questions_json = json.dumps(questions)
     
-    return jsonify({'message': 'Poll started'}), 200
-
-@app.route('/end_poll/<poll_id>', methods=['POST'])
-def end_poll(poll_id):
-    r.set(f'poll:{poll_id}:active', 'false')
+    # Armazenar no Redis
+    r.set(f"poll:{poll_id}:questions", questions_json)
     
-    # Arquiva o poll
-    questions = r.hgetall(f'poll:{poll_id}:questions')
-    results = {q: r.hgetall(f'poll:{poll_id}:{q}') for q in questions.keys()}
-    
-    r.hmset(f'poll:{poll_id}:results', results)
-    r.delete(f'poll:{poll_id}:questions')
-    
-    return jsonify({'message': 'Poll ended'}), 200
+    return jsonify(message="Poll started")
 
 @app.route('/vote', methods=['POST'])
 def vote():
@@ -36,25 +26,20 @@ def vote():
     question = data['question']
     option = data['option']
     
-    if r.get(f'poll:{poll_id}:active') != 'true':
-        return jsonify({'message': 'Poll is not active'}), 400
+    # Construir a chave para a votação
+    key = f"poll:{poll_id}:votes:{question}:{option}"
     
-    # Incrementa a contagem de votos
-    r.hincrby(f'poll:{poll_id}:{question}', option, 1)
+    # Incrementar o contador de votos
+    r.incr(key)
     
-    return jsonify({'message': 'Vote recorded'}), 200
+    return jsonify(message="Vote recorded")
 
 @app.route('/results/<poll_id>', methods=['GET'])
 def results(poll_id):
-    if r.get(f'poll:{poll_id}:active') == 'true':
-        return jsonify({'message': 'Poll is still active'}), 400
+    keys = r.keys(f"poll:{poll_id}:votes:*")
+    results = {key: int(r.get(key)) for key in keys}
     
-    results = r.hgetall(f'poll:{poll_id}:results')
-    return jsonify(results), 200
-
-@app.route('/')
-def index():
-    return render_template('index.html')
+    return jsonify(results)
 
 if __name__ == '__main__':
     app.run(debug=True)
