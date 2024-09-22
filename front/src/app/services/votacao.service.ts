@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class VotacaoService {
-  private apiUrl = 'http://localhost:5000'; // URL da API Flask
+  private apiUrl = 'http://localhost:5000'; 
 
   constructor(private http: HttpClient) {}
 
