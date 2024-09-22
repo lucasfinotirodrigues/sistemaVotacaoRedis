@@ -111,6 +111,32 @@ def resultados(sessao):
 
     return jsonify(resultados), 200
 
+# Rota para listar todas as sessões de votação
+@app.route('/votacao/sessoes', methods=['GET'])
+def listar_sessoes():
+    # Inicializa o cursor para SCAN
+    cursor = 0
+    sessoes = set()
+
+    while True:
+        # Executa SCAN para obter as chaves
+        cursor, chaves = client.scan(cursor, match='votacao:*')
+
+        for chave in chaves:
+            chave_str = chave.decode('utf-8')
+            partes = chave_str.split(':')
+            if len(partes) > 1:
+                sessoes.add(partes[1])
+
+        # Se o cursor retornar 0, SCAN terminou
+        if cursor == 0:
+            break
+
+    if not sessoes:
+        return jsonify({"message": "Nenhuma sessão encontrada"}), 404
+
+    return jsonify({"sessoes": list(sessoes)}), 200
+
 # Rota para encerrar uma sessão de votação
 @app.route('/votacao/encerrar', methods=['POST'])
 def encerrar_votacao():
