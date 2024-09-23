@@ -40,7 +40,7 @@
         </section>
 
         <!-- Formulário para votar -->
-        <section class="votar hidden">
+        <section class="votar">
             <h2>Votar</h2>
             <form id="votarForm">
                 <label for="sessaoVotar">Sessão:</label>
@@ -51,33 +51,37 @@
 
                 <label for="opcaoId">ID da Opção:</label>
                 <input type="text" id="opcaoId" name="opcaoId" required>
-
-                <button type="submit">Votar</button>
+                <div style="display: flex; justify-content: end;">
+                    <button type="submit">Votar</button>
+                </div>
             </form>
             <p id="votarMessage"></p>
         </section>
 
         <!-- Formulário para obter resultados -->
-        <section class="resultados hidden">
+        <section class="resultados">
             <h2>Obter Resultados</h2>
             <form id="resultadosForm">
                 <label for="sessaoResultados">Sessão:</label>
                 <input type="text" id="sessaoResultados" name="sessaoResultados" required>
-
-                <button type="submit">Ver Resultados</button>
+                <div style="display: flex; justify-content: end;">
+                    <button type="submit">Ver Resultados</button>
+                </div>
             </form>
             <pre id="resultadosDisplay"></pre>
         </section>
 
-        <div class="hidden">
+        <section>
           <h2>Encerrar Sessão de Votação</h2>
           <form id="encerrarVotacaoForm">
-              <label for="sessaoEncerrar">ID da Sessão:</label>
+              <label for="sessaoEncerrar">Nome da Sessão:</label>
               <input type="text" id="sessaoEncerrar" required>
-              <button type="submit">Encerrar Sessão</button>
+              <div style="display: flex; justify-content: end;">
+                  <button type="submit">Encerrar Sessão</button>
+              </div>
           </form>
           <p id="encerrarVotacaoMessage"></p>
-      </div>
+        </section>
     </div>
 
     <script src="./static/script.js"></script>
