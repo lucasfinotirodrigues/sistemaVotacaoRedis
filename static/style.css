@@ -39,6 +39,7 @@ input[type="text"], input[type="number"], textarea {
 button {
   display: block;
   width: 100%;
+  max-width: 200px;
   padding: 10px;
   background-color: #28a745;
   color: white;
@@ -52,6 +53,17 @@ button:hover {
   background-color: #218838;
 }
 
+.outline {
+  background-color: transparent;
+  color: #28a745;
+  border: 1px solid #28a745;
+}
+
+.outline:hover {
+  background-color: #eeeeee;
+  color: #28a745;
+  border: 1px solid #28a745;
+}
 p {
   color: #ff0000;
   text-align: center;
