@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Votação Online</title>
+    <link rel="stylesheet" href="./static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Sessão de Votação</h1>
+
+        <!-- Formulário para iniciar votação -->
+        <section class="votacao-iniciar">
+            <h2>Iniciar Votação</h2>
+            <form id="iniciarVotacaoForm">
+                <label for="sessao">Nome da Sessão:</label>
+                <input type="text" id="sessao" name="sessao" required>
+
+                <label for="perguntas">Perguntas (JSON):</label>
+                <textarea id="perguntas" name="perguntas" rows="4" placeholder='{"id": 1, "texto": "Sua pergunta", "opcoes": [{"id": 1, "texto": "Opção 1"}, {"id": 2, "texto": "Opção 2"}]}' required></textarea>
+
+                <button type="submit">Iniciar Votação</button>
+            </form>
+            <p id="iniciarVotacaoMessage"></p>
+        </section>
+
+        <h1>Sessões Criadas</h1>
+        <ul id="sessoes-lista">
+            <!-- As sessões serão listadas aqui -->
+        </ul>
+
+        <!-- Formulário para votar -->
+        <section class="votar">
+            <h2>Votar</h2>
+            <form id="votarForm">
+                <label for="sessaoVotar">Sessão:</label>
+                <input type="text" id="sessaoVotar" name="sessaoVotar" required>
+
+                <label for="perguntaId">ID da Pergunta:</label>
+                <input type="text" id="perguntaId" name="perguntaId" required>
+
+                <label for="opcaoId">ID da Opção:</label>
+                <input type="text" id="opcaoId" name="opcaoId" required>
+
+                <button type="submit">Votar</button>
+            </form>
+            <p id="votarMessage"></p>
+        </section>
+
+        <!-- Formulário para obter resultados -->
+        <section class="resultados">
+            <h2>Obter Resultados</h2>
+            <form id="resultadosForm">
+                <label for="sessaoResultados">Sessão:</label>
+                <input type="text" id="sessaoResultados" name="sessaoResultados" required>
+
+                <button type="submit">Ver Resultados</button>
+            </form>
+            <pre id="resultadosDisplay"></pre>
+        </section>
+
+        <div>
+          <h2>Encerrar Sessão de Votação</h2>
+          <form id="encerrarVotacaoForm">
+              <label for="sessaoEncerrar">ID da Sessão:</label>
+              <input type="text" id="sessaoEncerrar" required>
+              <button type="submit">Encerrar Sessão</button>
+          </form>
+          <p id="encerrarVotacaoMessage"></p>
+      </div>
+    </div>
+
+    <script src="./static/script.js"></script>
+</body>
+</html>
