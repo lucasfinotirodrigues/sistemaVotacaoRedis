@@ -1,10 +1,17 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import redis
+from flask_cors import CORS
 
 # Conectar ao Redis
 client = redis.Redis(host='localhost', port=6379, db=0)
 
 app = Flask(__name__)
+
+CORS(app)
+
+@app.route('/', )
+def index():
+    return render_template('index.html')
 
 # Rota para iniciar uma sessão de votação
 @app.route('/votacao/iniciar', methods=['POST'])
@@ -12,12 +19,13 @@ def iniciar_votacao():
     data = request.json
     sessao = data.get('sessao')
     perguntas = data.get('perguntas')
-
+    print("Perguntas =>", perguntas)
     if not sessao or not perguntas:
         return jsonify({"message": "Sessão ou perguntas não fornecidas"}), 400
     
     # Armazenar perguntas e opções no Redis
-    for pergunta in perguntas:
+    for pergunta in perguntas['perguntas']:
+        print("Pergunta => ", pergunta)
         pergunta_id = pergunta["id"]
         pergunta_texto = pergunta["texto"]
 
@@ -111,31 +119,63 @@ def resultados(sessao):
 
     return jsonify(resultados), 200
 
-# Rota para listar todas as sessões de votação
+
+
 @app.route('/votacao/sessoes', methods=['GET'])
 def listar_sessoes():
-    # Inicializa o cursor para SCAN
     cursor = 0
-    sessoes = set()
+    sessoes = {}
 
     while True:
-        # Executa SCAN para obter as chaves
         cursor, chaves = client.scan(cursor, match='votacao:*')
 
         for chave in chaves:
             chave_str = chave.decode('utf-8')
             partes = chave_str.split(':')
-            if len(partes) > 1:
-                sessoes.add(partes[1])
 
-        # Se o cursor retornar 0, SCAN terminou
+            if len(partes) >= 3:
+                sessao_id = partes[1]
+                pergunta_id = partes[2]
+
+                # Obter o texto da pergunta
+                texto_pergunta = client.hget(f'votacao:{sessao_id}:{pergunta_id}', 'pergunta')
+                if texto_pergunta is not None:
+                    texto_pergunta = texto_pergunta.decode('utf-8')
+                else:
+                    continue  # Pula se não encontrar a pergunta
+
+                # Inicializa a sessão se não existir
+                if sessao_id not in sessoes:
+                    sessoes[sessao_id] = {"perguntas": {}}
+                
+                # Inicializa a pergunta se não existir
+                if pergunta_id not in sessoes[sessao_id]["perguntas"]:
+                    sessoes[sessao_id]["perguntas"][pergunta_id] = {
+                        "id": pergunta_id,  # Armazena o ID da pergunta
+                        "texto": texto_pergunta,
+                        "opcoes": []
+                    }
+
+                # Obter o texto das opções
+                if len(partes) == 3:  # Se é apenas a pergunta
+                    opcoes = client.hgetall(f'votacao:{sessao_id}:{pergunta_id}:opcoes')
+                    for opcao_id, opcao_texto in opcoes.items():
+                        opcao_texto = opcao_texto.decode('utf-8')
+                        opcao_id = opcao_id.decode('utf-8')
+                        sessoes[sessao_id]["perguntas"][pergunta_id]["opcoes"].append({
+                            "id": opcao_id,
+                            "texto": opcao_texto
+                        })
+
         if cursor == 0:
             break
 
     if not sessoes:
         return jsonify({"message": "Nenhuma sessão encontrada"}), 404
 
-    return jsonify({"sessoes": list(sessoes)}), 200
+    return jsonify({"sessoes": sessoes}), 200
+
+
 
 # Rota para encerrar uma sessão de votação
 @app.route('/votacao/encerrar', methods=['POST'])
