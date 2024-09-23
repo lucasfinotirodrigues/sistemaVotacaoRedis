@@ -6,10 +6,14 @@
     <title>Votação Online</title>
     <link rel="stylesheet" href="./static/style.css">
     <link rel="icon" type="image/x-icon" href="../static/favicon.ico">
+    <style>
+        .hidden { display: none; }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>Sessão de Votação</h1>
+
 
         <!-- Formulário para iniciar votação -->
         <section class="votacao-iniciar">
@@ -20,19 +24,23 @@
 
                 <label for="perguntas">Perguntas (JSON):</label>
                 <textarea id="perguntas" name="perguntas" rows="4" placeholder='{"id": 1, "texto": "Sua pergunta", "opcoes": [{"id": 1, "texto": "Opção 1"}, {"id": 2, "texto": "Opção 2"}]}' required></textarea>
-
-                <button type="submit">Iniciar Votação</button>
+                <div style="display: flex; justify-content: space-between;">
+                    <button class="outline" id="toggleVotacao"> Ver Sessões</button>
+                    <button type="submit">Iniciar Votação</button>
+                </div>
             </form>
             <p id="iniciarVotacaoMessage"></p>
         </section>
 
-        <h1>Sessões Criadas</h1>
-        <ul id="sessoes-lista">
-            <!-- As sessões serão listadas aqui -->
-        </ul>
+        <section class="salas-criadas hidden">
+            <h1>Sessões Criadas</h1>
+            <ul id="sessoes-lista">
+                <!-- As sessões serão listadas aqui -->
+            </ul>
+        </section>
 
         <!-- Formulário para votar -->
-        <section class="votar">
+        <section class="votar hidden">
             <h2>Votar</h2>
             <form id="votarForm">
                 <label for="sessaoVotar">Sessão:</label>
@@ -50,7 +58,7 @@
         </section>
 
         <!-- Formulário para obter resultados -->
-        <section class="resultados">
+        <section class="resultados hidden">
             <h2>Obter Resultados</h2>
             <form id="resultadosForm">
                 <label for="sessaoResultados">Sessão:</label>
@@ -61,7 +69,7 @@
             <pre id="resultadosDisplay"></pre>
         </section>
 
-        <div>
+        <div class="hidden">
           <h2>Encerrar Sessão de Votação</h2>
           <form id="encerrarVotacaoForm">
               <label for="sessaoEncerrar">ID da Sessão:</label>

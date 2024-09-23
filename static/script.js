@@ -1,3 +1,10 @@
+document.getElementById('toggleVotacao').addEventListener('click', function() {
+    const sections = document.querySelectorAll('.votacao-iniciar, .votar, .resultados, .hidden');
+    sections.forEach(section => {
+        section.classList.toggle('hidden');
+    });
+});
+
 document.getElementById('iniciarVotacaoForm').addEventListener('submit', async function(event) {
   event.preventDefault();
   
@@ -139,3 +146,5 @@ document.getElementById('encerrarVotacaoForm').addEventListener('submit', async 
       document.getElementById('encerrarVotacaoMessage').innerText = 'Erro ao encerrar sessão.';
   }
 });
+
+
